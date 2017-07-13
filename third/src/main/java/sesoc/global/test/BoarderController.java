@@ -47,7 +47,7 @@ import sesoc.global.test.vo.Customer;
 
 @Controller
 public class BoarderController {
-	// 테스트!!
+	// 테스트!! 윤상혁
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(BoarderController.class);
 	@Autowired
 	BoardRepository repo;
