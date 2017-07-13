@@ -20,7 +20,7 @@ import sesoc.global.test.vo.Customer;
  */
 @Controller
 public class HomeController {
-	private String name = "yoon ";
+	private String name = "yoon";
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	@Autowired
 	CustomerRepository repo;
