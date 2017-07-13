@@ -21,7 +21,8 @@ import sesoc.global.test.vo.Customer;
 @Controller
 public class HomeController {
 	
-	public String test = "test"; 
+	public String test = "test  dd"; 
+	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	@Autowired
 	CustomerRepository repo;
