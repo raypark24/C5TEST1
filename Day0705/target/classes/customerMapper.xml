@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 완벽하지 않은 코드는 들어가 있으면 안된다. -->
+<mapper namespace="sesoc.global.test.dao.CustomerDAO">
+	<!-- 회원가입 -->
+	<insert id="insert" parameterType="Customer" ><!-- id는 namespace에 있는 CustomerDAO안의 메서드명 -->
+		insert into customer values(
+			#{custid},#{password},#{name},#{email},#{division},#{idno},#{address}
+		)
+	</insert>
+	
+	<!-- 한 사람 조회 -->
+	<select id="selectOne" parameterType="map" resultType="Customer">
+		select * from customer
+		where
+			custid = #{custid}
+		and
+			password = #{password}
+	</select>
+	
+	<update id="update" parameterType="Customer">
+		update Customer 
+		set 
+			password=#{password},
+			name=#{name},
+			email=#{email},
+			division=#{division},
+			idno=#{idno},
+			address=#{address}
+		where
+			custid=#{custid}
+	</update>
+</mapper>

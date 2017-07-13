@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 완벽하지 않은 코드는 들어가 있으면 안된다. -->
+<mapper namespace="sesoc.global.test.dao.BoardDAO">
+	<!-- 회원가입 -->
+	
+	<select id="select" resultType="Board" parameterType="Map">
+		select 
+			boardnum,
+			custid,
+			title,
+			content,
+			to_char(inputdate,'YYYY-MM-DD') inputdate,
+			hits,
+			originalfile,
+			savedfile
+		 from board 
+		 where
+		 	<choose>
+		 		<when test="searchtype == 'title'">
+		 			title 
+		 		</when>
+		 		<when test="searchtype == 'content'">
+		 			content
+		 		</when>
+		 		<when test="searchtype == 'custid'">
+		 			custid
+		 		</when>
+		 		<otherwise>
+		 			title
+		 		</otherwise>
+		 	</choose>
+		 	like '%'||#{searchword}||'%'
+		  order by boardnum desc
+	</select>
+	
+	<select id="selectOne" parameterType="int" resultType="Board">
+		select * from board where boardnum=#{boardnum}
+	</select>
+	
+	<insert id="insert" parameterType="Board">
+		insert into board (
+			boardnum,
+			custid,
+			title,
+			content
+			<if test="originalfile != null">
+			, originalfile
+			, savedfile
+			</if>
+		)
+		values(
+			board_seq.nextval,#{custid},#{title},#{content}
+			<if test="originalfile != null">
+			,#{originalfile},#{savedfile}
+			</if>
+		)
+	</insert>
+	
+	<update id="update" parameterType="Board">
+		update board set 
+			title=#{title},
+			content=#{content}
+			<if test="originalfile != null">
+			,originalfile=#{originalfile}
+			,savedfile=#{savedfile}
+			</if>
+			where boardnum = #{boardnum}
+	</update>
+	<update id="updatehits" parameterType="int">
+		update board set hits=(select hits+1 from board where boardnum=#{boardnum}) where boardnum = #{boardnum}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from board where boardnum=#{boardnum}
+	</delete>
+	
+	<select id="getBoardCount" resultType="int" parameterType="Map">
+		select count(*) from board where
+			<choose>
+		 		<when test="searchtype == 'title'">
+		 			title 
+		 		</when>
+		 		<when test="searchtype == 'content'">
+		 			content
+		 		</when>
+		 		<when test="searchtype == 'custid'">
+		 			custid
+		 		</when>
+		 		<otherwise>
+		 			title
+		 		</otherwise>
+		 	</choose>
+		 	like '%'||#{searchword}||'%'
+		  order by boardnum desc
+	</select>
+	<!-- ranking -->
+	<select id="rankList" parameterType="int" resultType="Board">
+	<![CDATA[
+		select *
+		from (select * from board order by hits desc)
+		where rownum <= 3
+	]]>
+	</select>
+</mapper>
+	
+	
+	
+	
+	
+	
+	<!-- <insert id="insert" parameterType="Customer" >id는 namespace에 있는 CustomerDAO안의 메서드명
+		insert into customer values(
+			#{custid},#{password},#{name},#{email},#{division},#{idno},#{address}
+		)
+	</insert>
+	
+	한 사람 조회
+	<select id="selectOne" parameterType="map" resultType="Customer">
+		select * from customer
+		where
+			custid = #{custid}
+		and
+			password = #{password} -->
