@@ -26,7 +26,7 @@ public class BoardRepository {
 		RowBounds rb = new RowBounds(startRecord, countPerPage);
 		
 		BoardDAO daoB = sqlSession.getMapper(BoardDAO.class);
-		Map<String,String> search = new HashMap<>();
+		Map<String,String> search = new HashMap<String,String>();
 		
 		search.put("searchtype", searchtype);
 		search.put("searchword", searchword);
@@ -76,7 +76,7 @@ public class BoardRepository {
 	}
 	public int getCount(String searchtype,String searchword){
 		int result = 0;
-		Map<String,String> search = new HashMap<>();
+		Map<String,String> search = new HashMap<String,String>();
 		search.put("searchtype", searchtype);
 		search.put("searchword", searchword);
 		
@@ -86,7 +86,7 @@ public class BoardRepository {
 		return result;
 	}
 	public List<Board> rankList(int count){
-		List<Board> rankList = new ArrayList<>();
+		List<Board> rankList = new ArrayList<Board>();
 		BoardDAO daoB = sqlSession.getMapper(BoardDAO.class);
 		rankList = daoB.rankList(count);
 		return rankList;

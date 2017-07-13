@@ -43,8 +43,11 @@ import sesoc.global.test.util.PageNavigator;
 import sesoc.global.test.vo.Board;
 import sesoc.global.test.vo.Customer;
 
+
+
 @Controller
 public class BoarderController {
+	// 테스트!!
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(BoarderController.class);
 	@Autowired
 	BoardRepository repo;
@@ -67,7 +70,7 @@ public class BoarderController {
 		
 		PageNavigator navi = new PageNavigator(currentPage, totalRecordCount);
 		List<Board> boardList = repo.findAll(searchtype,searchword,navi.getStartRecord(),navi.getCountPerPage());
-		Map<String,String> map = new HashMap<>();
+		Map<String,String> map = new HashMap<String,String>();
 		map.put("searchtype", searchtype);
 		map.put("searchword", searchword);
 		

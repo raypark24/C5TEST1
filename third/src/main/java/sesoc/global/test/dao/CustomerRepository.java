@@ -35,7 +35,7 @@ public class CustomerRepository {
 	public Customer findCustomer(String custid,String password){ // selectOne
 		Customer resultC = null;
 		CustomerDAO daoC = sqlSession.getMapper(CustomerDAO.class);
-		Map<String,String> map = new HashMap<>();
+		Map<String,String> map = new HashMap<String,String>();
 		map.put("custid", custid);
 		map.put("password", password);
 		
