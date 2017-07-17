@@ -22,6 +22,20 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	<!-- 인터셉터 정의 -->
+	<beans:bean id = "loginInterceptor" class="sesoc.global.test.interceptor.LoginInterceptor">
+	</beans:bean>
+		<interceptors>
+			<interceptor>
+				<mapping path="/boardWriteForm"/>
+				<mapping path="/boardUpdateForm"/>
+				<mapping path="/boardDelete"/>
+				<mapping path="/download"/>
+				<beans:ref bean="loginInterceptor" />
+			</interceptor>
+		</interceptors>
+	
+	
 	<context:component-scan base-package="sesoc.global.test" />
 	
 	

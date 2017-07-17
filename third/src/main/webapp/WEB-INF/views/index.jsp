@@ -35,7 +35,7 @@ function deleteCustomer() {
 	<h2>[ SEBank ]</h2>
 	<ul>
 		<c:if test="${custid == null }">
-			<li><a href="join" >회원가입</a></li>
+			<li><a href="join1" >회원가입</a></li>
 			<li><a href="login" >로그인</a></li>
 		</c:if>
 		<c:if test="${custid != null}">

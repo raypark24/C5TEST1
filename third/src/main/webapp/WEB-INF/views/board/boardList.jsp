@@ -120,9 +120,9 @@
 	</tr>	
 	</c:forEach>
 </table>
-<c:if test="${not empty custid}">
+<%-- <c:if test="${not empty custid}"> --%>
 	<div class="write"><a class="btn" href="boardWriteForm">글쓰기</a></div>
-</c:if>
+<%-- </c:if> --%>
 
 <!-- Paging 출력 부분 -->
 <!-- 고칠부분 -->

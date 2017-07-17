@@ -16,7 +16,7 @@
 			hits,
 			originalfile,
 			savedfile
-		 from board 
+		 from board
 		 where
 		 	<choose>
 		 		<when test="searchtype == 'title'">
