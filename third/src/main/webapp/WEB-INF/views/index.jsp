@@ -45,8 +45,9 @@ function deleteCustomer() {
 		</c:if>
 		
 		<li><a href="boardList" >게시판</a></li>
+		<li><a href="NoticeList" >공지사항 글 보기</a></li>
 	</ul>
-	<img src="resources/twice.png" alt="첫화면" />
+	<img src="images/twice.png" alt="첫화면" />
 </div>
 </body>
 </html>

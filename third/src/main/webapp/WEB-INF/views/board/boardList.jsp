@@ -73,7 +73,7 @@
 
 <h2>[ 게시판 글 목록 ]</h2>
 <div class="home">
-	<a href="${pageContext.request.contextPath}/"><img src="resources/home.png" /></a>
+	<a href="${pageContext.request.contextPath}/"><img src="images/home.png" /></a>
 
 	<!-- 특정 글 검색 -->
 	<form id="search" action ="boardList" method="GET" >
@@ -103,13 +103,13 @@
 		<td>${stat.count + navi.currentPage*navi.countPerPage-navi.countPerPage}</td>
 		<td>
 		<c:if test="${board.originalfile != null}">
-			<img src="resources/clip.png" id="clip" />
+			<img src="images/clip.png" id="clip" />
 		</c:if>
 		</td>
 		<td class="title">
 			<c:forEach var="b" items="${rankList}" varStatus="s">
 				<c:if test="${b.boardnum == board.boardnum}">
-					<img src="resources/star.jpg" id="star" />
+					<img src="images/star.jpg" id="star" />
 				</c:if>
 			</c:forEach>
 			<a href="boardDetail?boardnum=${board.boardnum}&currentPage=${currentPage}&searchtype=${searchtype}&searchword=${searchword}">${board.title}</a>

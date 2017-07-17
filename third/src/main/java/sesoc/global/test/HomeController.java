@@ -45,24 +45,6 @@ public class HomeController {
 		// redirect 시
 		// return "redirect:home";
 	}
-
-	
-	
-	
-	@RequestMapping(value="/input", method=RequestMethod.POST)
-	public @ResponseBody Friend input(Friend friend){
-		logger.info("데이터수집" + friend);
-		
-		
-		return friend;
-	}
-	
-	@RequestMapping(value="input2", method=RequestMethod.POST)
-	public String input2(@ModelAttribute("friend") Friend friend,@ModelAttribute("birth") String birth){
-		logger.info("데이터수집" + friend);
-		
-		return "home";
-	}
 }
 	
 	//@Controller - 클래스 위에
