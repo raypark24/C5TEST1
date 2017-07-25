@@ -23,7 +23,8 @@ public class CustomerController {
 	@Autowired
 	CustomerRepository repo;
 	
-	@RequestMapping(value="/join", method=RequestMethod.POST)
+
+	@RequestMapping(value="/join1", method=RequestMethod.POST)
 	public String join(Customer customer){
 		System.out.println("customer/join");
 		repo.insertCustomer(customer);

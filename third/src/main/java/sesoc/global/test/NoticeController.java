@@ -5,19 +5,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -26,112 +19,86 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.CookieGenerator;
 
-import sesoc.global.test.dao.BoardRepository;
-import sesoc.global.test.dao.CustomerRepository;
 import sesoc.global.test.dao.NoticeRepository;
-import sesoc.global.test.service.BoardService;
 import sesoc.global.test.util.FileService;
 import sesoc.global.test.util.PageNavigator;
-import sesoc.global.test.vo.Board;
-import sesoc.global.test.vo.Customer;
 import sesoc.global.test.vo.Notice;
 
 @Controller
-public class BoarderController {
-	// 테스트!! 윤상혁
-	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(BoarderController.class);
+public class NoticeController {
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(NoticeController.class);
 	@Autowired
-	BoardRepository repo;
-	@Autowired
-	NoticeRepository nrepo;
+	NoticeRepository repo;
 	
-	final String uploadPath = "/boardfile"; // 파일이 저장되는 하드디스크 공간.
+	final String uploadPath = "/noticefile"; // 파일 경로
+	
 	/**
-	 * 글 목록 요청
-	 * @param model
-	 * @return
+	 * 공지사항 목록
 	 */
-	@RequestMapping(value="/boardList", method=RequestMethod.GET)
-	public String BoardList(
+	@RequestMapping(value="noticeList", method=RequestMethod.GET)
+	public String noticeList(
 			@RequestParam(value="currentPage", defaultValue="1") int currentPage,
 			@RequestParam(value="searchtype", defaultValue="title") String searchtype,
 			@RequestParam(value="searchword", defaultValue="") String searchword,
-			Model model){
-		logger.info("searchword : " + searchword);
-		int totalRecordCount = repo.getCount(searchtype,searchword) + nrepo.getCount(searchtype, searchword);
+			Model model
+			){
+		logger.info("searchword : "+searchword);
+		int totalRecordCount = repo.getCount(searchtype, searchword);
 		System.out.println("전체 글 갯수 : "+ totalRecordCount);
 		
 		PageNavigator navi = new PageNavigator(currentPage, totalRecordCount);
-		
-		List<Notice> noticeList = nrepo.findAll("", "", navi.getStartRecord(), navi.getCountPerPage()); 
-		int noticeCount = noticeList.size();
-		int noticePage = (noticeCount/(currentPage*navi.getCountPerPage()));
-		List<Board> boardList;
-		System.out.println("navi.startcount : "+navi.getStartRecord());
-		if(noticePage >= 1){
-			boardList = repo.findAll(searchtype,searchword,navi.getStartRecord(),navi.getCountPerPage()-navi.getCountPerPage());
-		}
-		else{
-			navi.setStartRecord(0);
-			boardList = repo.findAll(searchtype,searchword,navi.getStartRecord(),navi.getCountPerPage()-noticeCount);
-		}
-		System.out.println("noticeCount : "+noticeCount);
-		System.out.println("noticePage : "+noticePage);
-		
+		List<Notice> noticeList = repo.findAll(searchtype,searchword,navi.getStartRecord(),navi.getCountPerPage());
 		Map<String,String> map = new HashMap<String,String>();
 		map.put("searchtype", searchtype);
 		map.put("searchword", searchword);
 		
-		model.addAttribute("noticeList",noticeList);
 		model.addAttribute("currentPage",currentPage);
 		model.addAttribute("searchtype", searchtype);
 		model.addAttribute("searchword", searchword);
-		model.addAttribute("boardList",boardList);
+		model.addAttribute("noticeList", noticeList);
 		model.addAttribute("navi",navi);
 		model.addAttribute("map",map);
 		
-		List<Board> rankList = repo.rankList(3);
+		List<Notice> rankList = repo.rankList(3);
 		model.addAttribute("rankList",rankList);
 		
-		return "board/boardList";
+		return "notice/noticeList";
 	}
-	@RequestMapping(value="boardDetail", method=RequestMethod.GET)
-	public String BoardDetail(Model model,
-			@RequestParam("boardnum") int boardnum,
+	@RequestMapping(value="noticeDetail", method=RequestMethod.GET)
+	public String NoticeDetail(Model model,
+			@RequestParam("noticenum") int noticenum,
 			@RequestParam(value="currentPage", defaultValue="1") int currentPage,
 			@RequestParam(value="searchtype", defaultValue="title") String searchtype,
 			@RequestParam(value="searchword", defaultValue="") String searchword
 			){
-		Board board = repo.findOne(boardnum);
-		repo.updatehits(boardnum);
-		String fullPath = uploadPath + "/" + board.getSavedfile();
+		Notice notice = repo.findOne(noticenum);
+		System.out.println(notice);
+		repo.updatehits(noticenum);
+		String fullPath = uploadPath + "/" + notice.getSavedfile();
 		
 		File f = new File(fullPath);
 		String mimeType = new MimetypesFileTypeMap().getContentType(f);
 		System.out.println("mimeType= " + mimeType);
 		
 		
-		System.out.println(board);
-		System.out.println("========"+board.getOriginalfile());
+		System.out.println(notice);
+		System.out.println("========"+notice.getOriginalfile());
 		int lastIndex=0;
 		String originalFile = "";
-		if(board.getOriginalfile()!=null){
-			originalFile = board.getOriginalfile();
+		if(notice.getOriginalfile()!=null){
+			originalFile = notice.getOriginalfile();
 		}
 		lastIndex = originalFile.lastIndexOf(".");
 		String ext="";
 		//확장자가 없으면 -1리턴
 		if(lastIndex==-1) ext="";
-		else ext = board.getOriginalfile().substring(lastIndex+1);
+		else ext = notice.getOriginalfile().substring(lastIndex+1);
 		
 		if(mimeType.contains("image") || (ext.equals("png"))){
 			model.addAttribute("mime","image");
@@ -149,94 +116,94 @@ public class BoarderController {
 		model.addAttribute("currentPage",currentPage);
 		model.addAttribute("searchtype", searchtype);
 		model.addAttribute("searchword", searchword);
-		model.addAttribute("board",board);
-		return "board/boardDetail";
+		model.addAttribute("notice",notice);
+		return "notice/noticeDetail";
 	}
 	
 	
-	@RequestMapping(value="boardWriteForm", method=RequestMethod.GET)
-	public String BoardWriteForm(Model model,HttpSession session){
+	@RequestMapping(value="noticeWriteForm", method=RequestMethod.GET)
+	public String noticeWriteForm(Model model,HttpSession session){
 		System.out.println(session.getAttribute("custid"));
-		return "board/boardWrite";
+		return "notice/noticeWrite";
 	}
 	
 	
-	@RequestMapping(value="boardWrite", method=RequestMethod.POST)
-	public String BoardWrite(Board board,HttpSession session,
+	@RequestMapping(value="noticeWrite", method=RequestMethod.POST)
+	public String noticeWrite(Notice notice,HttpSession session,
 			MultipartFile upload){
 		String custid = (String)session.getAttribute("custid");
-		board.setCustid(custid);
+		notice.setCustid(custid);
 		
 		if(!upload.isEmpty()){
 			String originalFileName = upload.getOriginalFilename();
 			String savedFileName = FileService.saveFile(upload, uploadPath);
-			board.setOriginalfile(originalFileName);
-			board.setSavedfile(savedFileName);
+			notice.setOriginalfile(originalFileName);
+			notice.setSavedfile(savedFileName);
 		}
 	
-		System.out.println(board);
-		int result = repo.insert(board);
+		System.out.println("--"+notice);
+		int result = repo.insert(notice);
 		
-		return "redirect:boardList";
+		return "redirect:noticeList";
 	}
-	@RequestMapping(value="boardUpdateForm", method=RequestMethod.GET)
-	public String BoardUpdateForm(Model model,@RequestParam("boardnum") int boardnum,
+	@RequestMapping(value="noticeUpdateForm", method=RequestMethod.GET)
+	public String NoticeUpdateForm(Model model,@RequestParam("noticenum") int noticenum,
 			@RequestParam(value="currentPage", defaultValue="1") int currentPage,
 			@RequestParam(value="searchtype", defaultValue="title") String searchtype,
 			@RequestParam(value="searchword", defaultValue="") String searchword
 			){
-		Board board = repo.findOne(boardnum);
-		model.addAttribute("board",board);
+		Notice notice = repo.findOne(noticenum);
+		model.addAttribute("notice",notice);
 		
 		model.addAttribute("currentPage",currentPage);
 		model.addAttribute("searchtype", searchtype);
 		model.addAttribute("searchword", searchword);
-		return "board/boardUpdate";
+		return "notice/noticeUpdate";
 	}
-	@RequestMapping(value="boardUpdate", method=RequestMethod.POST)
-	public String BoardUpdate(Board board,MultipartFile upload, RedirectAttributes rttr){
-		Board savedBoard = repo.findOne(board.getBoardnum());
+	@RequestMapping(value="noticeUpdate", method=RequestMethod.POST)
+	public String noticeUpdate(Notice notice,MultipartFile upload, RedirectAttributes rttr){
+		Notice savednotice = repo.findOne(notice.getnoticenum());
 /*		System.out.println(upload.getOriginalFilename());
-		System.out.println(savedBoard.getOriginalfile());
-		System.out.println(uploadPath + "/" + savedBoard.getSavedfile());*/
+		System.out.println(savednotice.getOriginalfile());
+		System.out.println(uploadPath + "/" + savednotice.getSavedfile());*/
 		System.out.println(!upload.isEmpty());
-		boolean a = (upload.getOriginalFilename() != savedBoard.getOriginalfile());
+		boolean a = (upload.getOriginalFilename() != savednotice.getOriginalfile());
 		System.out.println(a);
 		if(upload.isEmpty()){
-			System.out.println(board);
-			repo.update(board);
+			System.out.println(notice);
+			repo.update(notice);
 		}
 		if(!upload.isEmpty()
-				&& (upload.getOriginalFilename() != savedBoard.getOriginalfile())){
+				&& (upload.getOriginalFilename() != savednotice.getOriginalfile())){
 				String originalFileName = upload.getOriginalFilename();
 				String savedFileName = FileService.saveFile(upload, uploadPath);
-				board.setOriginalfile(originalFileName);
-				board.setSavedfile(savedFileName);
-				System.out.println(board);
-				repo.update(board);
+				notice.setOriginalfile(originalFileName);
+				notice.setSavedfile(savedFileName);
+				System.out.println(notice);
+				repo.update(notice);
 				System.out.println("-----");
-				String fullPath = uploadPath + "/" + savedBoard.getSavedfile();
+				String fullPath = uploadPath + "/" + savednotice.getSavedfile();
 				FileService.deleteFile(fullPath);
 				System.out.println("-----");
 		}
-		rttr.addAttribute("boardnum",board.getBoardnum());
-		return "redirect:boardDetail";
+		rttr.addAttribute("noticenum",notice.getnoticenum());
+		return "redirect:noticeDetail";
 	}
-	@RequestMapping(value="boardDelete", method=RequestMethod.GET)
-	public String BoardDelete(@RequestParam("boardnum") int boardnum){
-		Board deleteBoard = repo.findOne(boardnum);
-		String fullPath = uploadPath + "/" + deleteBoard.getSavedfile();
+	@RequestMapping(value="noticeDelete", method=RequestMethod.GET)
+	public String noticeDelete(@RequestParam("noticenum") int noticenum){
+		Notice deletenotice = repo.findOne(noticenum);
+		String fullPath = uploadPath + "/" + deletenotice.getSavedfile();
 		FileService.deleteFile(fullPath);
-		int result = repo.delete(boardnum);
-		return "redirect:boardList";
+		int result = repo.delete(noticenum);
+		return "redirect:noticeList";
 	}
 	
-	@RequestMapping("/download")
-	public String download(@RequestParam("boardnum") int boardnum, HttpServletResponse response){
-		Board board = repo.findOne(boardnum);
+	@RequestMapping("/noticedownload")
+	public String download(@RequestParam("noticenum") int noticenum, HttpServletResponse response){
+		Notice notice = repo.findOne(noticenum);
 		
-		String originalFile = board.getOriginalfile();
-		String savedFile = board.getSavedfile();
+		String originalFile = notice.getOriginalfile();
+		String savedFile = notice.getSavedfile();
 		
 		// 이미지 등과 같은 것을 브라우저에서 열리는 것을 막고 다운로드 받도록 조정할 수 있다.
 		try {
@@ -246,7 +213,7 @@ public class BoarderController {
 			// TODO: handle exception
 		}
 		
-		String fullPath = uploadPath + "/" + board.getSavedfile();
+		String fullPath = uploadPath + "/" + notice.getSavedfile();
 		FileInputStream fis = null;
 		ServletOutputStream sos = null;
 		
@@ -264,5 +231,3 @@ public class BoarderController {
 		return null;
 	}
 }
-
-

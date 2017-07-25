@@ -35,7 +35,7 @@ function deleteCustomer() {
 	<h2>[ SEBank ]</h2>
 	<ul>
 		<c:if test="${custid == null }">
-			<li><a href="join1" >회원가입</a></li>
+			<li><a href="join" >회원가입</a></li>
 			<li><a href="login" >로그인</a></li>
 		</c:if>
 		<c:if test="${custid != null}">
@@ -45,7 +45,7 @@ function deleteCustomer() {
 		</c:if>
 		
 		<li><a href="boardList" >게시판</a></li>
-		<li><a href="NoticeList" >공지사항 글 보기</a></li>
+		<li><a href="noticeList" >공지사항 글 보기</a></li>
 	</ul>
 	<img src="images/twice.png" alt="첫화면" />
 </div>

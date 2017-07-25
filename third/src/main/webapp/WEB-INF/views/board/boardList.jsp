@@ -3,6 +3,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html>
@@ -98,9 +99,26 @@
 		<th>조회수</th>
 	</tr>
 	
-	<c:forEach var="board" items="${boardList}" varStatus="stat">
+	<c:forEach var="notice" items="${noticeList}" varStatus="stat">
 	<tr>
 		<td>${stat.count + navi.currentPage*navi.countPerPage-navi.countPerPage}</td>
+		<td>
+		<c:if test="${notice.originalfile != null}">
+			<img src="images/clip.png" id="clip" />
+		</c:if>
+		</td>
+		<td class="title">
+			<a href="noticeDetail?noticenum=${notice.noticenum}&currentPage=${currentPage}&searchtype=${searchtype}&searchword=${searchword}">[  공지사항  ]      ${notice.title}</a>
+		</td>
+		<td>${notice.inputdate}</td>
+		<td>${notice.custid}</td>
+		<td>${notice.hits}</td>
+	</tr>	
+	</c:forEach>
+	
+	<c:forEach var="board" items="${boardList}" varStatus="stat">
+	<tr>
+		<td>${stat.count + fn:length(noticeList) + navi.currentPage*navi.countPerPage-navi.countPerPage}</td>
 		<td>
 		<c:if test="${board.originalfile != null}">
 			<img src="images/clip.png" id="clip" />

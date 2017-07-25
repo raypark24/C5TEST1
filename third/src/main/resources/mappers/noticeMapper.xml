@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 완벽하지 않은 코드는 들어가 있으면 안된다. -->
+<mapper namespace="sesoc.global.test.dao.NoticeDAO">
+	<!-- 회원가입 -->
+
+<!-- 서브쿼리 공지사항 5개만 위에 띄우기 -->	
+<!-- 	<select id="select" resultType="Notice" parameterType="Map">
+	<![CDATA[
+		select *
+		from (select 
+			noticenum,
+			custid,
+			title,
+			content,
+			to_char(inputdate,'YYYY-MM-DD') inputdate,
+			hits,
+			originalfile,
+			savedfile
+		 from notice
+		 where
+		 ]]>
+		 	<choose>
+		 		<when test="searchtype == 'title'">
+		 			title 
+		 		</when>
+		 		<when test="searchtype == 'content'">
+		 			content
+		 		</when>
+		 		<otherwise>
+		 			title
+		 		</otherwise>
+		 	</choose>
+		 <![CDATA[
+		 	like '%'||#{searchword}||'%'
+		  order by noticenum desc)
+		where rownum <= 5
+	]]>
+	</select> -->
+	
+	<select id="select" resultType="Notice" parameterType="Map">
+		select 
+			noticenum,
+			custid,
+			title,
+			content,
+			to_char(inputdate,'YYYY-MM-DD') inputdate,
+			hits,
+			originalfile,
+			savedfile
+		 from notice
+		 where
+		 	<choose>
+		 		<when test="searchtype == 'title'">
+		 			title 
+		 		</when>
+		 		<when test="searchtype == 'content'">
+		 			content
+		 		</when>
+		 		<otherwise>
+		 			title
+		 		</otherwise>
+		 	</choose>
+		 	like '%'||#{searchword}||'%'
+		  order by noticenum desc
+	</select>
+	
+	<select id="selectOne" parameterType="int" resultType="Notice">
+		select * from notice where noticenum=#{noticenum}
+	</select>
+	
+	<insert id="insert" parameterType="Notice">
+		insert into notice (
+			noticenum,
+			custid,
+			title,
+			content
+			<if test="originalfile != null">
+			, originalfile
+			, savedfile
+			</if>
+		)
+		values(
+			notice_seq.nextval,'admin',#{title},#{content}
+			<if test="originalfile != null">
+			,#{originalfile},#{savedfile}
+			</if>
+		)
+	</insert>
+	
+	<update id="update" parameterType="Notice">
+		update notice set 
+			title=#{title},
+			content=#{content}
+			<if test="originalfile != null">
+			,originalfile=#{originalfile}
+			,savedfile=#{savedfile}
+			</if>
+			where noticenum = #{noticenum}
+	</update>
+	<update id="updatehits" parameterType="int">
+		update notice set hits=(select hits+1 from notice where noticenum=#{noticenum}) where noticenum = #{noticenum}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from notice where noticenum=#{noticenum}
+	</delete>
+	
+	<select id="getNoticeCount" resultType="int" parameterType="Map">
+		select count(*) from notice where
+			<choose>
+		 		<when test="searchtype == 'title'">
+		 			title 
+		 		</when>
+		 		<when test="searchtype == 'content'">
+		 			content
+		 		</when>
+		 		<otherwise>
+		 			title
+		 		</otherwise>
+		 	</choose>
+		 	like '%'||#{searchword}||'%'
+		  order by noticenum desc
+	</select>
+	<!-- ranking -->
+	<select id="rankList" parameterType="int" resultType="notice">
+	<![CDATA[
+		select *
+		from (select * from notice order by hits desc)
+		where rownum <= 3
+	]]>
+	</select>
+</mapper>
+	
+	
+	
+	
+	
+	
+	<!-- <insert id="insert" parameterType="Customer" >id는 namespace에 있는 CustomerDAO안의 메서드명
+		insert into customer values(
+			#{custid},#{password},#{name},#{email},#{division},#{idno},#{address}
+		)
+	</insert>
+	
+	한 사람 조회
+	<select id="selectOne" parameterType="map" resultType="Customer">
+		select * from customer
+		where
+			custid = #{custid}
+		and
+			password = #{password} -->
